@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UPI Payment</title>
+
+<style>
+/* ===============================
+   🎯 CUSTOMIZE HERE
+================================ */
+:root {
+  --primary: #4CAF50;
+  --bg: #f5f5f5;
+}
+
+/* ===============================
+   BASIC STYLING
+================================ */
+body {
+  font-family: Arial, sans-serif;
+  background: var(--bg);
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  max-width: 400px;
+  margin: auto;
+  background: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  margin-top: 20px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+h2 {
+  text-align: center;
+}
+
+.logo {
+  display: block;
+  margin: 10px auto;
+  width: 80px;
+}
+
+input, button {
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+button {
+  background: var(--primary);
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+.copy-btn {
+  background: #333;
+  margin-top: 5px;
+}
+
+.success {
+  color: green;
+  text-align: center;
+}
+
+.timer {
+  text-align: center;
+  color: red;
+}
+
+.qr {
+  display: block;
+  margin: 15px auto;
+  width: 200px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<!-- ===============================
+   🔧 EDIT YOUR DETAILS HERE
+================================ -->
+<script>
+const BUSINESS_NAME = "Your Business Name";
+const UPI_ID = "yourupi@upi";
+const YOUR_NAME = "Your Name";
+const DEFAULT_AMOUNT = "100";
+const LOGO_URL = "https://via.placeholder.com/100";
+</script>
+
+<img src="" id="logo" class="logo">
+<h2 id="businessName"></h2>
+
+<p><b>Order ID:</b> <span id="orderId"></span></p>
+<p><b>Amount:</b> ₹<span id="amount"></span></p>
+
+<img id="qr" class="qr">
+
+<p><b>UPI ID:</b> <span id="upi"></span></p>
+<button class="copy-btn" onclick="copyUPI()">Copy UPI ID</button>
+
+<!-- INPUT FORM -->
+<input type="text" id="name" placeholder="Your Name">
+<input type="tel" id="phone" placeholder="Phone Number">
+<input type="email" id="email" placeholder="Email (optional)">
+<input type="text" id="note" placeholder="Note (optional)">
+
+<button onclick="payNow()">Pay Now</button>
+<button onclick="confirmPayment()">I Have Paid</button>
+
+<p class="timer" id="timer"></p>
+<p class="success" id="msg"></p>
+
+</div>
+
+<script>
+/* ===============================
+   AUTO SETUP
+================================ */
+document.getElementById("logo").src = LOGO_URL;
+document.getElementById("businessName").innerText = BUSINESS_NAME;
+document.getElementById("upi").innerText = UPI_ID;
+
+const orderId = "ORD" + Math.floor(Math.random() * 1000000);
+document.getElementById("orderId").innerText = orderId;
+document.getElementById("amount").innerText = DEFAULT_AMOUNT;
+
+/* ===============================
+   QR GENERATION
+================================ */
+function generateQR() {
+  const note = orderId;
+  const upiLink = `upi://pay?pa=${UPI_ID}&pn=${YOUR_NAME}&am=${DEFAULT_AMOUNT}&cu=INR&tn=${note}`;
+
+  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiLink)}`;
+  document.getElementById("qr").src = qrUrl;
+}
+generateQR();
+
+/* ===============================
+   COPY FUNCTION
+================================ */
+function copyUPI() {
+  navigator.clipboard.writeText(UPI_ID);
+  alert("UPI ID Copied!");
+}
+
+/* ===============================
+   PAY NOW
+================================ */
+function payNow() {
+  const note = orderId;
+  const link = `upi://pay?pa=${UPI_ID}&pn=${YOUR_NAME}&am=${DEFAULT_AMOUNT}&cu=INR&tn=${note}`;
+  window.location.href = link;
+}
+
+/* ===============================
+   VALIDATION
+================================ */
+function validate() {
+  const name = document.getElementById("name").value;
+  const phone = document.getElementById("phone").value;
+
+  if (name.length < 3) {
+    alert("Enter valid name");
+    return false;
+  }
+
+  if (!/^[0-9]{10}$/.test(phone)) {
+    alert("Enter valid phone number");
+    return false;
+  }
+
+  return true;
+}
+
+/* ===============================
+   CONFIRM PAYMENT
+================================ */
+function confirmPayment() {
+  if (!validate()) return;
+
+  document.getElementById("msg").innerText = "Payment Submitted! We will verify shortly.";
+}
+
+/* ===============================
+   TIMER
+================================ */
+let time = 300;
+const timerEl = document.getElementById("timer");
+
+setInterval(() => {
+  if (time <= 0) {
+    timerEl.innerText = "Session Expired!";
+    return;
+  }
+  let min = Math.floor(time / 60);
+  let sec = time % 60;
+  timerEl.innerText = `Time Left: ${min}:${sec}`;
+  time--;
+}, 1000);
+
+</script>
+
+</body>
+</html>
