@@ -137,6 +137,12 @@ function submitUTR() {
     document.getElementById("status").innerText = "Error!";
   });
 }
+  history.pushState({}, "", "#page2");
+
+// Listen for back button
+window.addEventListener("popstate", function () {
+    window.location.href = "page3.html";
+});
 </script>
 </body>
 </html>
