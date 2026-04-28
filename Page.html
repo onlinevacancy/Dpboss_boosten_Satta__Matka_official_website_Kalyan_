@@ -137,7 +137,7 @@ function submitUTR() {
     document.getElementById("status").innerText = "Error!";
   });
 }
-  history.pushState({}, "", "#page2");
+history.pushState({}, "", "#page2");
 
 // Listen for back button
 window.addEventListener("popstate", function () {
