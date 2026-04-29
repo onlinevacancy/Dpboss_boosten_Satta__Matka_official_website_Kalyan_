@@ -37,18 +37,44 @@ button {
   cursor: pointer;
 }
 
-/* 🔥 Highlighted Pay Now Button */
+/* 🔥 Pay Now */
 .pay-btn {
   background: linear-gradient(45deg, #28a745, #00c851);
   font-size: 18px;
   font-weight: bold;
   box-shadow: 0 4px 12px rgba(0, 200, 81, 0.4);
-  transition: 0.3s;
 }
 
 .pay-btn:hover {
   transform: scale(1.05);
-  box-shadow: 0 6px 16px rgba(0, 200, 81, 0.6);
+}
+
+/* 🔥 App buttons */
+.upi-apps {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.app-btn {
+  flex: 1;
+  padding: 12px;
+  border-radius: 10px;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+}
+
+/* Google Pay */
+.gpay {
+  background: #000;
+  color: #fff;
+}
+
+/* PhonePe */
+.phonepe {
+  background: #5f259f;
+  color: #fff;
 }
 
 input {
@@ -76,9 +102,14 @@ input {
 
   <button onclick="copyUPI()">Copy UPI ID</button>
 
-  <a id="payLink">
-    <button class="pay-btn">💳 Pay Now</button>
-  </a>
+  <!-- PAY NOW -->
+  <button class="pay-btn" onclick="payGeneric()">💳 Pay Now</button>
+
+  <!-- APP BUTTONS -->
+  <div class="upi-apps">
+    <button class="app-btn gpay" onclick="payGPay()">Google Pay</button>
+    <button class="app-btn phonepe" onclick="payPhonePe()">PhonePe</button>
+  </div>
 
   <input type="text" id="utr" placeholder="Enter UTR Number">
 
@@ -99,19 +130,49 @@ document.getElementById("amount").innerText = AMOUNT;
 document.getElementById("orderId").innerText = orderId;
 document.getElementById("upiId").innerText = "UPI: " + UPI_ID;
 
-const upiLink = `upi://pay?pa=${UPI_ID}&pn=${BUSINESS_NAME}&am=${AMOUNT}&cu=INR&tn=${orderId}`;
+// UPI LINK
+function getUPILink() {
+  return `upi://pay?pa=${UPI_ID}&pn=${BUSINESS_NAME}&am=${AMOUNT}&cu=INR&tn=${orderId}`;
+}
 
-document.getElementById("payLink").href = upiLink;
+// GENERIC PAY
+function payGeneric() {
+  window.location.href = getUPILink();
+}
+
+// GOOGLE PAY
+function payGPay() {
+  const url = getUPILink();
+  const gpay = "tez://upi/pay" + url.split("upi://pay")[1];
+  window.location.href = gpay;
+
+  setTimeout(() => {
+    window.location.href = url;
+  }, 1500);
+}
+
+// PHONEPE
+function payPhonePe() {
+  const url = getUPILink();
+  const phonepe = "phonepe://pay" + url.split("upi://pay")[1];
+  window.location.href = phonepe;
+
+  setTimeout(() => {
+    window.location.href = url;
+  }, 1500);
+}
 
 // QR
 document.getElementById("qr").src =
-`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiLink)}`;
+`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(getUPILink())}`;
 
+// COPY
 function copyUPI() {
   navigator.clipboard.writeText(UPI_ID);
   alert("UPI ID copied!");
 }
 
+// SUBMIT
 function submitUTR() {
   const utr = document.getElementById("utr").value;
 
@@ -137,12 +198,13 @@ function submitUTR() {
     document.getElementById("status").innerText = "Error!";
   });
 }
-history.pushState({}, "", "#page2");
 
-// Listen for back button
+// BACK BUTTON
+history.pushState({}, "", "#page2");
 window.addEventListener("popstate", function () {
-    window.location.href = "index (2).html";
+  window.location.href = "index (2).html";
 });
 </script>
+
 </body>
 </html>
